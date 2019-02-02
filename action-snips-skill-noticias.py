@@ -31,17 +31,18 @@ def extraer_noticia():
         tit = tit.replace('<description>','@')
         tit = tit.replace('</description>','@')
         tit = tit.split('@')
-        cabeceras += tit[1] + "\r\n"
-        noticias += tit[1] + "\r\n" + tit[3] + "\r\n"
-    return (cabeceras, noticias)
+        cabeceras += tit[1] + ".\r\n"
+        noticias += tit[1] + ".\r\n" + tit[3] + ".\r\n"
+        result = [cabeceras, noticias]
+    return result
 
 def intent_received(hermes, intent_message):
+    mensaje = extraer_noticia()
     
     if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
-        sentence = noticias
-
-    if intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        sentence = cabeceras
+        sentence = 'Éstas son las noticias de hoy: ' + mensaje[1]
+    elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
+        sentence = 'Éstos son los titulares de hoy: ' + mensaje[0]
                        
     else:
         return
