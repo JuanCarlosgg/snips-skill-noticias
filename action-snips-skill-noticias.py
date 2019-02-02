@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 from hermes_python.hermes import Hermes 
 import requests
-import html2text
-from html.parser import HTMLParser
 
 MQTT_IP_ADDR = "localhost" 
 MQTT_PORT = 1883 
