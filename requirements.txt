@@ -1,0 +1,5 @@
+hermes_python==0.1.29
+
+requests
+
+html2text

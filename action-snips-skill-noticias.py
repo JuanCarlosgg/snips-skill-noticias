@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+from hermes_python.hermes import Hermes 
+import requests
+import html2text
+from html.parser import HTMLParser
+
+MQTT_IP_ADDR = "localhost" 
+MQTT_PORT = 1883 
+MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT)) 
+
+
+def extraer_noticia():
+    max = 5
+    noticias = ""
+    cabeceras = ""
+    url = "https://www.europapress.es/rss/rss.aspx"
+    titulares = list()
+    contenidos = list()
+    response = requests.get(url)
+    webContent = response.text.encode('latin_1')
+    webContent = webContent.decode()
+    webContent = webContent.replace('<item>','@')
+    webContent = webContent.split('@')
+    for x in webContent:
+        if webContent.index(x) == 0:
+            continue
+        if webContent.index(x) > max:
+            break
+        tit = x.replace('<title>','@')
+        tit = tit.replace('</title>','@')
+        tit = tit.replace('<description>','@')
+        tit = tit.replace('</description>','@')
+        tit = tit.split('@')
+        cabeceras += tit[1] + "\r\n"
+        noticias += tit[1] + "\r\n" + tit[3] + "\r\n"
+    return (cabeceras, noticias)
+
+def intent_received(hermes, intent_message):
+    
+    if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
+        sentence = noticias
+
+    if intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
+        sentence = cabeceras
+                       
+    else:
+        return
+    
+    hermes.publish_end_session(intent_message.session_id, sentence)
+    
+    
+with Hermes(MQTT_ADDR) as h:
+    h.subscribe_intents(intent_received).start()
