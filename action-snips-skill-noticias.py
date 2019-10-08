@@ -11,7 +11,7 @@ def extraer_noticia():
     max = 5
     noticias = ""
     cabeceras = ""
-    url = "https://www.europapress.es/rss/rss.aspx"
+    url = "http://ep00.epimg.net/rss/elpais/portada.xml"
     titulares = list()
     contenidos = list()
     response = requests.get(url)
