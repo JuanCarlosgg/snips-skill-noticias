@@ -15,7 +15,7 @@ def extraer_noticia():
     titulares = list()
     contenidos = list()
     response = requests.get(url)
-    webContent = response.text.encode('latin_1')
+    webContent = response.text.encode('utf-8')
     webContent = webContent.decode()
     webContent = webContent.replace('<item>','@')
     webContent = webContent.split('@')
