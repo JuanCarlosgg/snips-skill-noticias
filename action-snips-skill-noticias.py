@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from hermes_python.hermes import Hermes 
+from hermes_python.ontology.dialogue import DialogueConfiguration
 import requests
 
 MQTT_IP_ADDR = "localhost" 
@@ -49,7 +50,14 @@ def intent_received(hermes, intent_message):
         return
     
     hermes.publish_end_session(intent_message.session_id, sentence)
-    
+
+# def intent_stop(hermes, intent_message):
+#    if intent_message.intent.intent_name == 'juancarlos:Cancelar':
+#        hermes.publish_end_session(intent_message.session_id, sentence)
+ 
     
 with Hermes(MQTT_ADDR) as h:
+    dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
+    
+    h.configure_dialogue(dialogue_conf)                   
     h.subscribe_intents(intent_received).start()
