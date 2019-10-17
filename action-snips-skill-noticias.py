@@ -28,8 +28,11 @@ def extraer_noticia():
         tit = tit.replace('</title>','@')
         tit = tit.replace('<description>','@')
         tit = tit.replace('</description>','@')
+        tit = tit.replace('<![CDATA[', '')
+        tit = tit.replace(']]>', '')
         tit = tit.split('@')
         cabeceras += tit[1] + ".\r\n"
+        
         noticias += tit[1] + ".\r\n" + tit[3] + ".\r\n"
         result = [cabeceras, noticias]
     return result
