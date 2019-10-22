@@ -66,14 +66,16 @@ def intent_received(hermes, intent_message):
     mensaje = extraer_noticia()
     intentHandler(hermes, intent_message, mensaje)
      
-"""
+
 def intent_stop(hermes, intent_message):
-    if intent_message.intent.intent_name == 'juancarlos:Cancelar':
-        hermes.publish_end_session(intent_message.session_id, 'Ya me callo')
-""" 
+    #if intent_message.intent.intent_name == 'juancarlos:Cancelar':
+    hermes.publish_end_session(intent_message.session_id, 'Ya me callo')
     
 with Hermes(MQTT_ADDR) as h:
     #dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
     
     #h.configure_dialogue(dialogue_conf)                   
-    h.subscribe_intents(intent_received).start()
+    h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
+        .subscribe_intent("jaimevegas:DiNoticias", intent_received) \
+        .subscribe_intent("juancarlos:Cancelar", intent_stop) \
+        .start()
