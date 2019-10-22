@@ -40,24 +40,25 @@ def extraer_noticia():
 # https://docs.snips.ai/articles/platform/dialog/frame-based-dm
 # https://github.com/snipsco/hermes-protocol/tree/develop/platforms/hermes-javascript#api
 # https://github.com/MrJohnZoidberg/Snips-Einkaufsliste/blob/master/action-ShoppingList.py
-#
+# https://forum.snips.ai/t/interrupt-snips-by-saying-the-hotword/1287/8 de momento no se puede parar el tts.
 def intentHandler(hermes, intent_message, mensaje):
     if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstas son las noticias de hoy: '+ [])
+        hermes.publish_end_session(intent_message.session_id,  'Éstas son las noticias de hoy: '+ mensaje[1])
+        """
         contenido = mensaje[1]
         for i in len(contenido):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], [])
             intent_stop(hermes,intent_message)
         hermes.publish_end_session(intent_message.session_id, '')
-    
+        """
     elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ', [])
-        titulares =  mensaje[0]
+        hermes.publish_end_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0])
+        """titulares =  mensaje[0]
         for i in len(titulares):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], [])
             intent_stop(hermes,intent_message)
         hermes.publish_end_session(intent_message.session_id, '')
-        
+        """
     else:
         return 
 
@@ -69,7 +70,7 @@ def intent_received(hermes, intent_message):
 
 def intent_stop(hermes, intent_message):
     #if intent_message.intent.intent_name == 'juancarlos:Cancelar':
-    hermes.publish_end_session(intent_message.session_id, 'Ya me callo')
+    hermes.publish_end_session(intent_message.session_id, '')
 
 
 with Hermes(MQTT_ADDR) as h:
