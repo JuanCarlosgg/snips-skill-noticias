@@ -72,7 +72,7 @@ def intent_stop(hermes, intent_message):
  
     
 with Hermes(MQTT_ADDR) as h:
-    dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
+    #dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
     
-    h.configure_dialogue(dialogue_conf)                   
+    #h.configure_dialogue(dialogue_conf)                   
     h.subscribe_intents(intent_received).start()
