@@ -51,11 +51,12 @@ def intentHandler(hermes, intent_message, mensaje):
         hermes.publish_end_session(intent_message.session_id, '')
     
     elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ')
-        titulares =  mensaje[0]
+        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0])
+        """titulares =  mensaje[0]
         for i in len(titulares):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], ["juancarlos:Cancelar"])
             intent_stop(hermes,intent_message)
+        """
         hermes.publish_end_session(intent_message.session_id, '')
         
     else:
@@ -79,4 +80,4 @@ with Hermes(MQTT_ADDR) as h:
     h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
         .subscribe_intent("jaimevegas:DiNoticias", intent_received) \
         .subscribe_intent("juancarlos:Cancelar", intent_stop) \
-        .start()
+        .loop_forever()
