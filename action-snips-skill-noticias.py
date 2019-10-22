@@ -79,4 +79,4 @@ with Hermes(MQTT_ADDR) as h:
     h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
         .subscribe_intent("jaimevegas:DiNoticias", intent_received) \
         .subscribe_intent("juancarlos:Cancelar", intent_stop) \
-        .loop_forever()
+        .start()
