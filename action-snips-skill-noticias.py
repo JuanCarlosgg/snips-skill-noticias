@@ -44,18 +44,19 @@ def extraer_noticia():
 def intentHandler(hermes, intent_message, mensaje):
     #intent_stop(hermes,intent_message)
     if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstas son las noticias de hoy: ')
-        contenido = mensaje[1]
+        hermes.publish_continue_session(intent_message.session_id,  'Éstas son las noticias de hoy: '+  mensaje[1], ["juancarlos:Cancelar"])
+        """contenido =
         for i in len(contenido):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i])
             intent_stop(hermes,intent_message)
-
+        """
     elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ')
-        titulares =  mensaje[0]
+        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0], ["juancarlos:Cancelar"])
+        """titulares =  mensaje[0]
         for i in len(titulares):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i])
             intent_stop(hermes,intent_message)
+        """
     else:
         return 
     hermes.publish_end_session(intent_message.session_id, 'Ya me callo')
@@ -65,11 +66,11 @@ def intent_received(hermes, intent_message):
     mensaje = extraer_noticia()
     intentHandler(hermes, intent_message, mensaje)
      
-
+"""
 def intent_stop(hermes, intent_message):
     if intent_message.intent.intent_name == 'juancarlos:Cancelar':
         hermes.publish_end_session(intent_message.session_id, 'Ya me callo')
- 
+""" 
     
 with Hermes(MQTT_ADDR) as h:
     #dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
