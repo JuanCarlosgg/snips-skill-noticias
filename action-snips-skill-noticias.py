@@ -42,7 +42,7 @@ def extraer_noticia():
 # https://github.com/MrJohnZoidberg/Snips-Einkaufsliste/blob/master/action-ShoppingList.py
 #
 def intentHandler(hermes, intent_message, mensaje):
-    intent_stop(hermes,intent_message)
+    #intent_stop(hermes,intent_message)
     if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
         hermes.publish_continue_session(intent_message.session_id,  'Éstas son las noticias de hoy: ')
         contenido = mensaje[1]
