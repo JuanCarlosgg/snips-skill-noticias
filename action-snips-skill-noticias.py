@@ -51,7 +51,7 @@ def intentHandler(hermes, intent_message, mensaje):
         hermes.publish_end_session(intent_message.session_id, '')
     
     elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0])
+        hermes.publish_continue_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0], [])
         """titulares =  mensaje[0]
         for i in len(titulares):
             hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], ["juancarlos:Cancelar"])
