@@ -45,7 +45,7 @@ def intentHandler(hermes, intent_message):
     descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
     sentence = 'Éstos son los titulares de hoy: ' + titulares[i]
     i = i + 1
-    hermes.publish_continue_session(intent_message.session_id,  sentence, [])
+    return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
          
 
     # hermes.publish_end_session(intent_message.session_id, sentence)                  
@@ -57,17 +57,17 @@ def intent_continuar(hermes, intent_message):
         sentence = titulares[i]
         i = i + 1
         if i >= len(titulares):
-            hermes.publish_end_session(intent_message.session_id, sentence + '. Esas son todas las noticias')
+            return hermes.publish_end_session(intent_message.session_id, sentence + '. Esas son todas las noticias')
         else:    
-            hermes.publish_continue_session(intent_message.session_id,  sentence, [])
+            return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
         
 
     else:
-        hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
+        return hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
 
 
 def intent_stop(hermes, intent_message):
-    hermes.publish_end_session(intent_message.session_id, '')
+    return hermes.publish_end_session(intent_message.session_id, '')
 
 
 with Hermes(MQTT_ADDR) as h:
