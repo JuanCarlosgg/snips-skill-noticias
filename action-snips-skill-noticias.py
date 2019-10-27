@@ -36,6 +36,11 @@ def intentHandler(hermes, intent_message):
     global N, titulares, descripcion, sentence, i
 
     if intent_message.intent.intent_name == 'jaimevegas:DiTitulares': 
+        dialogue_conf = DialogueConfiguration()                          \
+                        .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
+
+
+        h.configure_dialogue(dialogue_conf)     
         mensaje = extraer_noticia()
         i = 0
         N = 3
@@ -57,6 +62,9 @@ def intent_continuar(hermes, intent_message):
         sentence = titulares[i]
         i = i + 1
         hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
+        if i >= len(titulares):
+            hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
+
     else:
         hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
 
@@ -66,10 +74,8 @@ def intent_stop(hermes, intent_message):
 
 
 with Hermes(MQTT_ADDR) as h:
-    dialogue_conf = DialogueConfiguration()                          \
-                        .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
-
-
-    h.configure_dialogue(dialogue_conf)      
+    
     h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
+        .subscribe_intent("juancarlos:Cancelar", intent_stop) \
+        .subscribe_intent("juancarlos:Siguiente", intent_continuar) \
         .start()
