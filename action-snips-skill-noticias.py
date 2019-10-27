@@ -2,6 +2,7 @@
 from hermes_python.hermes import Hermes 
 from hermes_python.ontology.dialogue import DialogueConfiguration
 import requests
+import json
 
 MQTT_IP_ADDR = "localhost" 
 MQTT_PORT = 1883 
@@ -21,7 +22,7 @@ def extraer_noticia():
     for x in webContent:
         x = x.replace('<![CDATA[', '')
         x = x.replace(']]>', '')
-
+        x = x.replace('\u2018', '')
         start = x.find('<title>') + 7
         end = x.find('</title>', start)
         titulos.append(x[start:end])
@@ -30,22 +31,24 @@ def extraer_noticia():
         end = x.find('</description>', start)
         descripcion.append(x[start:end])
 
-        result = [titulos, descripcion]
+        result = [titulos[1:], descripcion[1:]]
     return result
     
 # https://forum.snips.ai/t/interrupt-snips-by-saying-the-hotword/1287/8 de momento no se puede parar el tts.
 def intentHandler(hermes, intent_message):
     global N, titulares, descripcion, sentence, i
 
+#    h.subscribe_intent("juancarlos:Siguiente", intent_continuar).subscribe_intent("juancarlos:Cancelar")
     
     mensaje = extraer_noticia()
     i = 0
-    N = 3
+    N = 2
     titulares = [mensaje[0][n:n+N] for n in range(0, len(mensaje[0]), N)]
     descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
     sentence = 'Éstos son los titulares de hoy: '  + ', '.join(titulares[i])
     i = i + 1
-    return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
+    return hermes.publish_continue_session(intent_message.session_id,  sentence , ["juancarlos:Siguiente", "juancarlos:Cancelar"], 
+                                           custom_data= json.dumps({'i': i, 'titulares': titulares, 'descripcion': descripcion}))
          
 
     # hermes.publish_end_session(intent_message.session_id, sentence)                  
@@ -53,17 +56,21 @@ def intent_received(hermes, intent_message):
     return intentHandler(hermes, intent_message)
 
 def intent_continuar(hermes, intent_message):
+    cdata = json.loads(intent_message.custom_data)
+    i = cdata['i']
+    sentences = cdata['titulares']
+    descripcion = cdata['descripcion']
+
     if i < len(titulares):
         sentence =  ', '.join(titulares[i])
         i = i + 1
         if i >= len(titulares):
             return hermes.publish_end_session(intent_message.session_id, sentence + '. Esas son todas las noticias')
         else:    
-            return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
-        
-
+            return hermes.publish_continue_session(intent_message.session_id,  sentence , ["juancarlos:Siguiente", "juancarlos:Cancelar"],
+                                                   custom_data= json.dumps({'i': i, 'titulares': titulares, 'descripcion': descripcion}))
     else:
-        return hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
+        hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
 
 
 def intent_stop(hermes, intent_message):
@@ -71,13 +78,14 @@ def intent_stop(hermes, intent_message):
 
 
 with Hermes(MQTT_ADDR) as h:
-    """dialogue_conf = DialogueConfiguration()                          \
+    dialogue_conf = DialogueConfiguration()                          \
                         .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
 
 
     h.configure_dialogue(dialogue_conf)   
-    """
-    h.subscribe_intent("DiTitulares", intent_received) \
-        .subscribe_intent("Cancelar", intent_stop) \
-        .subscribe_intent("Siguiente", intent_continuar) \
+
+    
+    h.subscribe_intent("juancarlos:DiTitulares", intent_received) \
+        .subscribe_intent("juancarlos:Cancelar", intent_stop) \
+        .subscribe_intent("juancarlos:Siguiente", intent_continuar) \
         .start()
