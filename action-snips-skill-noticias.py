@@ -43,21 +43,21 @@ def intentHandler(hermes, intent_message):
     N = 3
     titulares = [mensaje[0][n:n+N] for n in range(0, len(mensaje[0]), N)]
     descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
-    sentence = 'Éstos son los titulares de hoy: ' # + titulares[i]
+    sentence = 'Éstos son los titulares de hoy: '  + ', '.join(titulares[i])
     i = i + 1
     return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
          
 
     # hermes.publish_end_session(intent_message.session_id, sentence)                  
 def intent_received(hermes, intent_message):
-    intentHandler(hermes, intent_message)
+    return intentHandler(hermes, intent_message)
 
 def intent_continuar(hermes, intent_message):
     if i < len(titulares):
-        sentence = titulares[i]
+        sentence =  ', '.join(titulares[i])
         i = i + 1
         if i >= len(titulares):
-            return hermes.publish_end_session(intent_message.session_id, 'hola' + '. Esas son todas las noticias')
+            return hermes.publish_end_session(intent_message.session_id, sentence + '. Esas son todas las noticias')
         else:    
             return hermes.publish_continue_session(intent_message.session_id,  sentence, [])
         
