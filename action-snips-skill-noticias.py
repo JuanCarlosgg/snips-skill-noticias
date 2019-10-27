@@ -9,7 +9,6 @@ MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT))
 
 
 def extraer_noticia():
-    max = 5
     noticias = ""
     cabeceras = ""
     url = "http://ep00.epimg.net/rss/elpais/portada.xml"
@@ -19,10 +18,6 @@ def extraer_noticia():
     webContent = webContent.replace('<item>','@')
     webContent = webContent.split('@')
     for x in webContent:
-        if webContent.index(x) == 0:
-            continue
-        if webContent.index(x) > max:
-            break
         tit = x.replace('<title>','@')
         tit = tit.replace('</title>','@')
         tit = tit.replace('<description>','@')
@@ -36,48 +31,45 @@ def extraer_noticia():
         result = [cabeceras, noticias]
     return result
     
-#Poner un índice en el que se comprueba linea a linea si hay un stop.
-# https://docs.snips.ai/articles/platform/dialog/frame-based-dm
-# https://github.com/snipsco/hermes-protocol/tree/develop/platforms/hermes-javascript#api
-# https://github.com/MrJohnZoidberg/Snips-Einkaufsliste/blob/master/action-ShoppingList.py
 # https://forum.snips.ai/t/interrupt-snips-by-saying-the-hotword/1287/8 de momento no se puede parar el tts.
-def intentHandler(hermes, intent_message, mensaje):
-    if intent_message.intent.intent_name == 'jaimevegas:DiNoticias':
-        hermes.publish_end_session(intent_message.session_id,  'Éstas son las noticias de hoy: '+ mensaje[1])
-        """
-        contenido = mensaje[1]
-        for i in len(contenido):
-            hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], [])
-            intent_stop(hermes,intent_message)
-        hermes.publish_end_session(intent_message.session_id, '')
-        """
-    elif intent_message.intent.intent_name == 'jaimevegas:DiTitulares':
-        hermes.publish_end_session(intent_message.session_id,  'Éstos son los titulares de hoy: ' + mensaje[0])
-        """titulares =  mensaje[0]
-        for i in len(titulares):
-            hermes.publish_continue_session(intent_message.session_id, mensaje[1][i], [])
-            intent_stop(hermes,intent_message)
-        hermes.publish_end_session(intent_message.session_id, '')
-        """
+def intentHandler(hermes, intent_message):
+    global N, titulares, descripcion, sentence, i
+
+    if intent_message.intent.intent_name == 'jaimevegas:DiTitulares': 
+        mensaje = extraer_noticia()
+        i = 0
+        N = 3
+        titulares = [mensaje[0][n:n+N] for n in range(0, len(mensaje[0]), N)]
+        descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
+        sentence = 'Éstos son los titulares de hoy: ' + titulares[i]
+        i = i + 1
+        hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
     else:
-        return 
+        hermes.publish_end_session(intent_message.session_id, '')
+         
 
     # hermes.publish_end_session(intent_message.session_id, sentence)                  
 def intent_received(hermes, intent_message):
-    mensaje = extraer_noticia()
-    intentHandler(hermes, intent_message, mensaje)
-     
+    intentHandler(hermes, intent_message)
+
+def intent_continuar(hermes, intent_message):
+    if i < len(titulares):
+        sentence = titulares[i]
+        i = i + 1
+        hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
+    else:
+        hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
+
 
 def intent_stop(hermes, intent_message):
-    #if intent_message.intent.intent_name == 'juancarlos:Cancelar':
     hermes.publish_end_session(intent_message.session_id, '')
 
 
 with Hermes(MQTT_ADDR) as h:
-    #dialogue_conf = DialogueConfiguration().enable_intent("Stop")  
-    
-    #h.configure_dialogue(dialogue_conf)                   
+    dialogue_conf = DialogueConfiguration()                          \
+                        .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
+
+
+    h.configure_dialogue(dialogue_conf)      
     h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
-        .subscribe_intent("jaimevegas:DiNoticias", intent_received) \
-        .subscribe_intent("juancarlos:Cancelar", intent_stop) \
         .start()
