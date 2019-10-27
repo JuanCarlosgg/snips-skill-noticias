@@ -77,7 +77,7 @@ with Hermes(MQTT_ADDR) as h:
 
     h.configure_dialogue(dialogue_conf)   
     """
-    h.subscribe_intent("juancarlos:DiTitulares", intent_received) \
-        .subscribe_intent("juancarlos:Cancelar", intent_stop) \
-        .subscribe_intent("juancarlos:Siguiente", intent_continuar) \
+    h.subscribe_intent("DiTitulares", intent_received) \
+        .subscribe_intent("Cancelar", intent_stop) \
+        .subscribe_intent("Siguiente", intent_continuar) \
         .start()
