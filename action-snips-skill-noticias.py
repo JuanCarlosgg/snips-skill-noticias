@@ -37,17 +37,15 @@ def extraer_noticia():
 def intentHandler(hermes, intent_message):
     global N, titulares, descripcion, sentence, i
 
-    if intent_message.intent.intent_name == 'juancarlos:DiTitulares':   
-        mensaje = extraer_noticia()
-        i = 0
-        N = 3
-        titulares = [mensaje[0][n:n+N] for n in range(0, len(mensaje[0]), N)]
-        descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
-        sentence = 'Éstos son los titulares de hoy: ' + titulares[i]
-        i = i + 1
-        hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
-    else:
-        hermes.publish_end_session(intent_message.session_id, '')
+    
+    mensaje = extraer_noticia()
+    i = 0
+    N = 3
+    titulares = [mensaje[0][n:n+N] for n in range(0, len(mensaje[0]), N)]
+    descripcion = [mensaje[1][n:n+N] for n in range(0, len(mensaje[1]), N)]
+    sentence = 'Éstos son los titulares de hoy: ' + titulares[i]
+    i = i + 1
+    hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
          
 
     # hermes.publish_end_session(intent_message.session_id, sentence)                  
@@ -77,7 +75,7 @@ with Hermes(MQTT_ADDR) as h:
                         .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
 
 
-        h.configure_dialogue(dialogue_conf)   
+    h.configure_dialogue(dialogue_conf)   
     h.subscribe_intent("juancarlos:DiTitulares", intent_received) \
         .subscribe_intent("juancarlos:Cancelar", intent_stop) \
         .subscribe_intent("juancarlos:Siguiente", intent_continuar) \
