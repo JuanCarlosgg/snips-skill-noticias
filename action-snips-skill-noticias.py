@@ -35,7 +35,7 @@ def extraer_noticia():
 def intentHandler(hermes, intent_message):
     global N, titulares, descripcion, sentence, i
 
-    if intent_message.intent.intent_name == 'jaimevegas:DiTitulares': 
+    if intent_message.intent.intent_name == 'juancarlos:DiTitulares': 
         dialogue_conf = DialogueConfiguration()                          \
                         .enable_intents(["juancarlos:Cancelar", "juancarlos:Siguiente"])  \
 
@@ -75,7 +75,7 @@ def intent_stop(hermes, intent_message):
 
 with Hermes(MQTT_ADDR) as h:
     
-    h.subscribe_intent("jaimevegas:DiTitulares", intent_received) \
+    h.subscribe_intent("juancarlos:DiTitulares", intent_received) \
         .subscribe_intent("juancarlos:Cancelar", intent_stop) \
         .subscribe_intent("juancarlos:Siguiente", intent_continuar) \
         .start()
