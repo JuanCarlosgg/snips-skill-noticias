@@ -9,26 +9,28 @@ MQTT_ADDR = "{}:{}".format(MQTT_IP_ADDR, str(MQTT_PORT))
 
 
 def extraer_noticia():
-    noticias = ""
-    cabeceras = ""
     url = "http://ep00.epimg.net/rss/elpais/portada.xml"
     response = requests.get(url)
     webContent = response.text.encode('utf-8')
     webContent = webContent.decode()
     webContent = webContent.replace('<item>','@')
     webContent = webContent.split('@')
+    titulos = list()
+    descripcion = list()
+    print(len(webContent))
     for x in webContent:
-        tit = x.replace('<title>','@')
-        tit = tit.replace('</title>','@')
-        tit = tit.replace('<description>','@')
-        tit = tit.replace('</description>','@')
-        tit = tit.replace('<![CDATA[', '')
-        tit = tit.replace(']]>', '')
-        tit = tit.split('@')
-        cabeceras += tit[1] + ".\r\n"
+        x = x.replace('<![CDATA[', '')
+        x = x.replace(']]>', '')
+
+        start = x.find('<title>') + 7
+        end = x.find('</title>', start)
+        titulos.append(x[start:end])
         
-        noticias += tit[1] + ".\r\n" + tit[3] + ".\r\n"
-        result = [cabeceras, noticias]
+        start = x.find('<description>') + 13
+        end = x.find('</description>', start)
+        descripcion.append(x[start:end])
+
+        result = [titulos, descripcion]
     return result
     
 # https://forum.snips.ai/t/interrupt-snips-by-saying-the-hotword/1287/8 de momento no se puede parar el tts.
@@ -61,9 +63,11 @@ def intent_continuar(hermes, intent_message):
     if i < len(titulares):
         sentence = titulares[i]
         i = i + 1
-        hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
         if i >= len(titulares):
-            hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
+            hermes.publish_end_session(intent_message.session_id, sentence + '. Esas son todas las noticias')
+        else:    
+            hermes.publish_continue_session(intent_message.session_id,  sentence, ['juancarlos:Cancelar', 'juancarlos:Siguiente'])
+        
 
     else:
         hermes.publish_end_session(intent_message.session_id, 'Esas son todas las noticias')
