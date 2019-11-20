@@ -20,7 +20,7 @@ def extraer_noticia():
     webContent = webContent.split('@')
     titulos = list()
     descripcion = list()
-    print len(webContent)
+    #print len(webContent)
     for x in webContent:
         x = x.replace('<![CDATA[', '')
         x = x.replace(']]>', '')
