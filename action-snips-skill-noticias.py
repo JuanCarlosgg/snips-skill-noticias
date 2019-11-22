@@ -52,7 +52,7 @@ def intentHandler(hermes, intent_message):
     descripcion = [(mensaje[1])[n:n + N] for n in range(0,
                    len(mensaje[1]), N)]
     sentence = '\xc3\x89stos son los titulares de hoy: ' \
-        + ', '.join(titulares[i])
+        + ', '.join(titulares[i] + "¿Quieres que siga leyendo?")
     i = i + 1
     return hermes.publish_continue_session(intent_message.session_id,
             sentence, ['juancarlos:Siguiente', 'juancarlos:Cancelar'],
@@ -83,7 +83,7 @@ def intent_continuar(hermes, intent_message):
                     sentence, ['juancarlos:Siguiente',
                     'juancarlos:Cancelar'],
                     custom_data=json.dumps({'i': i,
-                    'titulares': titulares,
+                    'titulares': titulares + "¿Quieres que siga leyendo?",
                     'descripcion': descripcion}))
     else:
         hermes.publish_end_session(intent_message.session_id,
