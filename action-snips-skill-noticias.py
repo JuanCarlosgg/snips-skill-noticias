@@ -80,10 +80,10 @@ def intent_continuar(hermes, intent_message):
                     sentence + '. Esas son todas las noticias')
         else:
             return hermes.publish_continue_session(intent_message.session_id,
-                    sentence, ['juancarlos:Siguiente',
+                    sentence + "¿Quieres que siga leyendo?", ['juancarlos:Siguiente',
                     'juancarlos:Cancelar'],
                     custom_data=json.dumps({'i': i,
-                    'titulares': titulares + "¿Quieres que siga leyendo?",
+                    'titulares': titulares ,
                     'descripcion': descripcion}))
     else:
         hermes.publish_end_session(intent_message.session_id,
@@ -95,11 +95,11 @@ def intent_stop(hermes, intent_message):
 
 
 with Hermes(MQTT_ADDR) as h:
-    dialogue_conf = \
-        DialogueConfiguration().enable_intents(['juancarlos:Cancelar',
-            'juancarlos:Siguiente'])
+    #dialogue_conf = \
+    #    DialogueConfiguration().enable_intents(['juancarlos:Cancelar',
+    #        'juancarlos:Siguiente'])
 
-    h.configure_dialogue(dialogue_conf)
+    #h.configure_dialogue(dialogue_conf)
 
     h.subscribe_intent('juancarlos:DiTitulares',
                        intent_received).subscribe_intent('juancarlos:Cancelar'
